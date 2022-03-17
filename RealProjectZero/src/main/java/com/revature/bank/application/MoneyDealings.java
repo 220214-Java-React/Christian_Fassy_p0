@@ -1,69 +1,108 @@
 package com.revature.bank.application;
 
-import java.util.Scanner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MoneyDealings {
-    Scanner scanner = new Scanner(System.in);
+    private static final Logger logger = LogManager.getLogger(MoneyDealings.class);
+    private double balance;
 
-    protected double withdraw;
-    protected double deposit;
-    protected double balance;
+    AccountDealings account = new AccountDealings();
 
-    boolean exit = true;
+    public double getBalance() {
 
-    public void BankApp() {
-        while (exit) {
-            System.out.println("Hello! Welcome to your interesting bank application!\n" +
-                    "How can I help you today?\n" +
-                    "1 - Check Balance\n" +
-                    "2 - Deposit\n" +
-                    "3 - Withdraw\n" +
-                    "4 - Exit\n");
-            int choice = scanner.nextInt();
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "select distinct balance from users where username = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
 
-            switch (choice) {
+            stmt.setString(1, account.getCurr());
+            ResultSet resultSet = stmt.executeQuery();
 
-                case 1://CURRENT BALANCE
-                    System.out.println("Your current balance is $" + balance + "\n");
-                    break;
+            if (resultSet.next()) {
+                balance = resultSet.getDouble("balance");
+            }
+        } catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
+        }
+        return balance;
+    }
 
-                case 2://DEPOSIT
-                    System.out.println("How much would you like to deposit?\n");
-                    deposit = scanner.nextDouble();
+    public void balancePatch() {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "update users set balance = ? where username = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
 
-                    if(deposit <= 0) {
-                        System.out.println("Unusable value...Try again\n");
-                        break;
-                    } else {
-                        System.out.println("You have deposited $" + deposit + "\n");
-                        balance += deposit;
-                        System.out.println("Your new balance is $" + balance + "\n");
-                        break;
-                    }
+            stmt.setDouble(1, balance);
+            stmt.setString(2, account.getCurr());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
+        }
 
-                case 3://WITHDRAW
-                    System.out.println("How much would you like to withdraw?\n");
-                    withdraw = scanner.nextDouble();
-                    System.out.println("You would like to withdraw $" + withdraw + "\n");
-                    if (balance - withdraw < 0) {
-                        System.out.println("Insufficient Funds");
-                        break;
-                    } else if (withdraw <= 0) {
-                        System.out.println("Unusable value...Try again\n");
-                        break;
-                    } else {
-                        System.out.println("You have withdrawn $" + withdraw + "\n");
-                        balance -= withdraw;
-                        System.out.println("Your new balance is $" + balance + "\n");
-                        break;
-                    }
+    }
 
-                case 4://EXIT
-                    exit = false;
-                    break;
+    public void withdraw(double withdraw) {
+        if (withdraw <= 0)
+        {
+            System.out.println("Cannot use this value... Try again");
+            return;
+        }
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "select distinct balance from users where username = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+
+            stmt.setString(1, account.getCurr());
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                balance = resultSet.getDouble("balance");
             }
 
+            if (balance >= withdraw) {
+                balance -= withdraw;
+                System.out.println("Withdrew $" + withdraw +
+                        "\nCurrent balance- $" + balance + "\n");
+            }else {
+                try {
+                    System.out.println("Insufficient funds... \n " +
+                            "Current balance- $" + balance + "\n");
+                } catch (ExceptionInInitializerError E) {
+                    System.out.println("Withdraw Failed");
+                }
+                ;
+            }
+        } catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
         }
-        System.out.println("we exited");
+        balancePatch();
+    }
+
+    public void deposit(double deposit) {
+        if (deposit <= 0)
+        {
+            System.out.println("Cannot use this value... Try again");
+            return;
+        }
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "select distinct balance from users where username = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+
+            stmt.setString(1, account.getCurr());
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                balance = resultSet.getDouble("balance");
+            }
+            balance += deposit;
+            System.out.println("Deposited $" + deposit +
+                    "\nCurrent balance- $" + balance + "\n");
+        } catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
+        }
+        balancePatch();
     }
 }

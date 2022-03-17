@@ -10,17 +10,19 @@ public class AccountDealings {
 
     Scanner scanner = new Scanner(System.in);
 
-    boolean exit = true;
 
     public static UserService userService;
     private static Logger logger;
     private static User currentUser;
 
+
     public void AccountApp() {
+        boolean exit = true;
         configure();
+
         while(exit)
         {
-            System.out.println("\nHello! Welcome!\n" +
+            System.out.println("\nHello! Welcome to Bank of Fassy!\n" +
                     "How can I help you today?\n" +
                     "1 - Who is logged in?\n" +
                     "2 - Register Account\n" +
@@ -31,19 +33,26 @@ public class AccountDealings {
 
             switch(choice)
             {
-                case 1:
-                   currentUser = userService.login();
+                case 1://Who is logged in?
+                    if(currentUser == null) {
+                        System.out.println("\n Nobody is logged in right now...");
+                    }else{
+                        System.out.println("\n" + currentUser.username + " is currently logged in!");
+
+                    }
                    break;
                 case 2:
                     userService.register();
+                    System.out.println("Registered a new user!");
                     break;
                 case 3:
-                    System.out.println(currentUser);
+                    currentUser = userService.login();
+                    System.out.println("\n" + currentUser.username + " is now logged in!");
                     break;
                 case 4:
+                    MoneyMenu money = new MoneyMenu();
+                    money.BankApp();
 
-                    MoneyDealings bank = new MoneyDealings();
-                    bank.BankApp();
                     break;
                 case 5:
                     exit = false;
@@ -63,4 +72,7 @@ public class AccountDealings {
         }
     }
 
+    public String getCurr() {
+        return currentUser.username;
+    }
 }

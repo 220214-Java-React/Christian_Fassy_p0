@@ -4,10 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
-
-
-
 // Singleton Design Pattern
 // -> a design through which you only ever create ONE SINGLE instance
 public class ConnectionFactory {
@@ -16,10 +12,10 @@ public class ConnectionFactory {
 
     // "jdbc:<dialect>://<host name>:<port>/<database name>?currentSchema=<schema name>"
     private static final String url =
-            "jdbc:postgresql://javareact.cc56e9n8qtvr.us-east-1.rds.amazonaws.com:5432/postgres?currentSchema=ProjectZero";
+            "jdbc:postgresql://javareact.cjurl0s0kcsf.us-east-2.rds.amazonaws.com:5432/postgres?currentSchema=p0";
 
     private static final String username = "postgres";
-    private static final String password = "Christian1";
+    private static final String password = "12345678";
     // this method creates a single instance if needed otherwise, returns the existing one.
     public static Connection getConnection() throws SQLException {
 
