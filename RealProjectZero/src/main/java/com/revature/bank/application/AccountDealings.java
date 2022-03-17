@@ -1,19 +1,23 @@
 package com.revature.bank.application;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class AccountDealings {
 
-    Users user = new Users();
-
     Scanner scanner = new Scanner(System.in);
-    String loggedIn = null;
-    String password = null;
-
 
     boolean exit = true;
 
+    public static UserService userService;
+    private static Logger logger;
+    private static User currentUser;
+
     public void AccountApp() {
+        configure();
         while(exit)
         {
             System.out.println("\nHello! Welcome!\n" +
@@ -28,25 +32,13 @@ public class AccountDealings {
             switch(choice)
             {
                 case 1:
-                    if (user.getUsernames() == null)
-                    {
-                        System.out.println("Nobody is logged in...");
-                        break;
-                    }
-                    else
-                    {
-                        System.out.println(user.getUsernames() + " is currently logged in!\n");
-                        break;
-                    }
+                   currentUser = userService.login();
+                   break;
                 case 2:
-                    System.out.println("What would you like your Username to be?");
-                    loggedIn = scanner.next();
-                    System.out.println("What would you like your Password to be?");
-                    password = scanner.next();
-
-                    user.SignUp(loggedIn, password);
+                    userService.register();
                     break;
                 case 3:
+                    System.out.println(currentUser);
                     break;
                 case 4:
 
@@ -60,4 +52,15 @@ public class AccountDealings {
             }
         }
     }
+    private static void configure(){
+        currentUser = null;
+        logger = LogManager.getLogger(AccountDealings.class);
+
+        try {
+            userService = new UserService();
+        } catch (NoSuchAlgorithmException e) {
+            logger.warn(e.getMessage(), e);
+        }
+    }
+
 }

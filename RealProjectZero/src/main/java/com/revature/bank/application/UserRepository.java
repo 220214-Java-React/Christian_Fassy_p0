@@ -1,33 +1,30 @@
 package com.revature.bank.application;
 
-//import com.revature.model.User;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 /**
-    UserRepository is the starting point of our persistence layer.
-
-    CRUD Operations are those that allow the modification or persistence of data in some
-
-                                DML -> Data Manipulation Language
-    C - Create                  insert
-    R - Read                    select
-    U - Up.date                  update
-    D - De.lete                  delete
+ * UserRepository is the starting point of our persistence layer.
+ * <p>
+ * CRUD Operations are those that allow the modification or persistence of data in some
+ * <p>
+ * DML -> Data Manipulation Language
+ * C - Create                  insert
+ * R - Read                    select
+ * U - Up.date                  update
+ * D - De.lete                  delete
  */
-public class UserRepository implements DAO<User>{
+public class UserRepository implements DAO<User> {
     private static final Logger logger = LogManager.getLogger(UserRepository.class);
 
     @Override
-    public void create(User user){
+    public void create(User user) {
         // here we write our SQL to create a user
         Connection connection = null;
 
@@ -39,11 +36,11 @@ public class UserRepository implements DAO<User>{
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPassword());
 
-            stmt.executeUpdate();
+            ResultSet resultSet = stmt.executeQuery();
         } catch (SQLException e) {
             logger.warn(e.getMessage(), e);
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -53,7 +50,7 @@ public class UserRepository implements DAO<User>{
         }
     }
 
-    public User getByUsername(String username){
+    public User getByUsername(String username) {
         User user = null;
 
         try (Connection connection = ConnectionFactory.getConnection()) {
@@ -65,7 +62,7 @@ public class UserRepository implements DAO<User>{
             // this
             ResultSet resultSet = stmt.executeQuery();
 
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 user = new User(
                         resultSet.getInt("id"),
                         resultSet.getString("username"),
@@ -80,13 +77,13 @@ public class UserRepository implements DAO<User>{
 
     // select * from users where id = ?
     @Override
-    public User getById(int id){
+    public User getById(int id) {
 
         User user = null;
         String sql = "select * from users where id = ?";
         Connection connection;
 
-        try{
+        try {
             connection = ConnectionFactory.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql);
 
@@ -94,7 +91,7 @@ public class UserRepository implements DAO<User>{
 
             ResultSet rs = stmt.executeQuery();
 
-            if(rs.next()){
+            if (rs.next()) {
                 user = new User(
                         rs.getInt("id"),
                         rs.getString("username"),
@@ -110,18 +107,18 @@ public class UserRepository implements DAO<User>{
 
     // select * from users
     @Override
-    public List<User> getAll(){
+    public List<User> getAll() {
         return null;
     }
 
     @Override
-    public void update(User user){
+    public void update(User user) {
 
     }
 
     // delete from users where id = ?
     @Override
-    public void deleteById(int id){
+    public void deleteById(int id) {
 
     }
 }

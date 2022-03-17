@@ -1,8 +1,7 @@
 package com.revature.bank.application;
 
-//import com.revature.util.ScannerFactory;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,31 +23,31 @@ public class UserService {
         currentUser = null;
     }
 
-    public void register(){
+    public void register() {
         System.out.println("\n-- User Registration --");
         userRepository.create(buildUser());
     }
 
-    public User login(){
+    public User login() {
         System.out.println("\n-- User Login --");
         return validate();
     }
 
-    public static User getCurrentUser(){
+    public static User getCurrentUser() {
         return currentUser;
     }
 
-    private User validate(){
+    private User validate() {
         User user = new User(getUsername(), getPassword());
         return isValid(user) ? user : null;
     }
 
-    private boolean isValid(User user){
+    private boolean isValid(User user) {
 
         User dbUser = userRepository.getByUsername(user.getUsername());
 
-        if(dbUser != null){
-            if(dbUser.getPassword().equals(user.getPassword())) {
+        if (dbUser != null) {
+            if (dbUser.getPassword().equals(user.getPassword())) {
                 currentUser = dbUser;
                 return true;
             }
@@ -58,21 +57,21 @@ public class UserService {
         return false;
     }
 
-    private User buildUser(){
+    private User buildUser() {
         User user = new User(getUsername(), getPassword());
         return !exists(user) ? user : buildUser();
     }
 
-    private String getUsername(){
+    private String getUsername() {
         String username = "";
         boolean valid = false;
 
-        while(!valid){
+        while (!valid) {
             System.out.print("Username: ");
             username = scanner.nextLine();
 
             //TODO: Username validation
-            if(username.length() > 4){
+            if (username.length() > 4) {
                 valid = true;
             } else {
                 System.out.println("Username must be longer than 4 characters.");
@@ -81,29 +80,29 @@ public class UserService {
         return username;
     }
 
-    private String getPassword(){
+    private String getPassword() {
         String password = "";
         boolean valid = false;
 
-        while(!valid){
+        while (!valid) {
             System.out.print("Password: ");
             password = scanner.nextLine();
 
             //TODO: Password validation
-            if(password.length() > 4){
+            if (password.length() > 4) {
                 valid = true;
-            } else{
+            } else {
                 System.out.println("Password must be longer than 4 characters.");
             }
         }
         return encryptPassword(password);
     }
 
-    private boolean exists(User user){
+    private boolean exists(User user) {
         // need to check if the username exists
-        if (userRepository.getByUsername(user.getUsername()) == null){
+        if (userRepository.getByUsername(user.getUsername()) == null) {
             return false;
-        } else{
+        } else {
             System.out.println("Username already exists.");
             return true;
         }
@@ -116,7 +115,8 @@ public class UserService {
 
         // if it doesn't return false
     }
-    private String encryptPassword(String password){
+
+    private String encryptPassword(String password) {
         return new String(messageDigest.digest(password.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     }
 }
